@@ -6,15 +6,16 @@ import { canManageRequest, isAdmin } from "@/lib/permissions"
 
 export async function PUT(
   request: Request,
-  { params }: { params: { id: string } }
+  context: any
 ) {
+  const { id } = context.params; // Access id directly
   try {
     const session = await getServerSession(authOptions)
     if (!session) {
       return NextResponse.json({ error: "Non autorisé" }, { status: 401 })
     }
 
-    const { id } = params
+    const id = context.params.id;
     const body = await request.json()
     const { status, notes } = body // Add notes
 
@@ -50,8 +51,9 @@ export async function PUT(
 
 export async function DELETE(
   request: Request,
-  { params }: { params: { id: string } }
+  context: any
 ) {
+  const { id } = context.params; // Access id directly
   try {
     const session = await getServerSession(authOptions)
     if (!session) {
@@ -59,7 +61,7 @@ export async function DELETE(
     }
 
     const existingRequest = await prisma.request.findUnique({
-      where: { id: params.id },
+      where: { id },
     })
 
     if (!existingRequest) {
@@ -71,7 +73,7 @@ export async function DELETE(
     }
 
     await prisma.request.delete({
-      where: { id: params.id },
+      where: { id },
     })
 
     return NextResponse.json({ message: "Demande supprimée avec succès" })

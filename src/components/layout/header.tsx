@@ -2,12 +2,11 @@
 
 import { useSession, signOut } from "next-auth/react"
 import Link from "next/link"
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 
 export function Header() {
   const { data: session } = useSession()
-  const router = useRouter();
-  const { pathname } = router;
+  const pathname = usePathname();
 
   const getLinkClasses = (href: string) => {
     const isActive = pathname === href;

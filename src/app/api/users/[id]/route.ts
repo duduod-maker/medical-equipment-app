@@ -6,14 +6,13 @@ import { authOptions } from "@/lib/auth";
 import { isAdmin } from "@/lib/permissions";
 import { Role, Prisma } from "@prisma/client";
 
-export async function PUT(req: Request, { params }: { params: { id: string } }) {
+export async function PUT(req: Request, context: any) {
+  const { id } = context.params; // Access id directly
   const session = await getServerSession(authOptions);
 
   if (!session || !isAdmin(session)) {
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
   }
-
-  const { id } = params;
   const body = await req.json();
   const { email, name, password, role } = body;
 
@@ -36,14 +35,13 @@ export async function PUT(req: Request, { params }: { params: { id: string } }) 
   }
 }
 
-export async function DELETE(req: Request, { params }: { params: { id: string } }) {
+export async function DELETE(req: Request, context: any) {
+  const { id } = context.params; // Access id directly
   const session = await getServerSession(authOptions);
 
   if (!session || !isAdmin(session)) {
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
   }
-
-  const { id } = params;
 
   try {
     await prisma.user.delete({

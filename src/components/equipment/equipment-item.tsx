@@ -2,25 +2,7 @@
 
 import { useSession } from "next-auth/react"
 import { canManageEquipment } from "@/lib/permissions"
-
-interface Equipment {
-  id: string
-  reference?: string
-  sector: string
-  room: string
-  resident: string
-  deliveryDate?: string
-  returnDate?: string
-  type: {
-    id: string
-    name: string
-  }
-  user: {
-    name?: string
-    email: string
-  }
-  createdAt: string
-}
+import { Equipment } from "@/types/equipment";
 
 interface EquipmentItemProps {
   equipment: Equipment

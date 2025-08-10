@@ -6,16 +6,14 @@ import { canManageEquipment, isAdmin } from "@/lib/permissions"
 
 export async function PUT(
   request: Request,
-  { params }: { params: { id: string } }
+  context: any
 ) {
-  console.log("Params received:", params); // Debugging line
+  const { id } = context.params; // Access id directly
   try {
     const session = await getServerSession(authOptions)
     if (!session) {
       return NextResponse.json({ error: "Non autorisé" }, { status: 401 })
     }
-
-    const { id } = params; // Revert to direct access
 
     const body = await request.json()
     const { typeId, reference, sector, room, resident, deliveryDate, returnDate, userId } = body
@@ -65,8 +63,9 @@ export async function PUT(
 
 export async function DELETE(
   request: Request,
-  { params }: { params: { id: string } }
+  context: any
 ) {
+  const { id } = context.params; // Access id directly
   try {
     const session = await getServerSession(authOptions)
     if (!session) {
@@ -74,7 +73,7 @@ export async function DELETE(
     }
 
     const equipment = await prisma.equipment.findUnique({
-      where: { id: params.id },
+      where: { id },
     })
 
     if (!equipment) {
@@ -86,7 +85,7 @@ export async function DELETE(
     }
 
     await prisma.equipment.delete({
-      where: { id: params.id },
+      where: { id },
     })
 
     return NextResponse.json({ message: "Matériel supprimé avec succès" })

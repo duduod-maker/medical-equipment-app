@@ -1,8 +1,9 @@
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { useSession } from "next-auth/react"
 import { EquipmentForm } from "./equipment-form"
-import { EquipmentItem } from "./equipment-item"
+import { EquipmentItem } from "././equipment-item"
 import { isAdmin } from "@/lib/permissions"
+import { Equipment, EquipmentType } from "@/types/equipment";
 
 // Custom hook for debouncing
 function useDebounce<T>(value: T, delay: number): T {
@@ -21,30 +22,6 @@ function useDebounce<T>(value: T, delay: number): T {
   return debouncedValue;
 }
 
-interface Equipment {
-  id: string
-  reference?: string
-  sector: string
-  room: string
-  resident: string
-  deliveryDate?: string
-  returnDate?: string
-  type: {
-    id: string
-    name: string
-  }
-  user: {
-    name?: string
-    email: string
-  }
-  createdAt: string
-}
-
-interface EquipmentType {
-  id: string
-  name: string
-}
-
 interface User {
   id: string;
   email: string;
@@ -60,11 +37,12 @@ export function EquipmentList() {
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState("")
   const debouncedSearch = useDebounce(search, 500); // 500ms debounce
+  
   const [selectedType, setSelectedType] = useState("")
   const [showForm, setShowForm] = useState(false)
   const [editingEquipment, setEditingEquipment] = useState<Equipment | null>(null)
 
-  const fetchEquipmentTypes = async () => {
+  const fetchEquipmentTypes = useCallback(async () => {
     try {
       const response = await fetch("/api/equipment-types")
       if (response.ok) {
@@ -74,9 +52,9 @@ export function EquipmentList() {
     } catch (error) {
       console.error("Erreur lors du chargement des types:", error)
     }
-  }
+  }, [setEquipmentTypes]);
 
-  const fetchUsers = async () => { // New function to fetch users
+  const fetchUsers = useCallback(async () => {
     try {
       const response = await fetch("/api/users")
       if (response.ok) {
@@ -86,32 +64,37 @@ export function EquipmentList() {
     } catch (error) {
       console.error("Erreur lors du chargement des utilisateurs:", error)
     }
-  }
+  }, [setUsers]);
+
+  const fetchEquipment = useCallback(async () => {
+    try {
+      const params = new URLSearchParams()
+      if (search) params.append("search", search) // Use 'search' directly
+      if (selectedType) params.append("type", selectedType)
+
+      const response = await fetch(`/api/equipment?${params}`)
+      if (response.ok) {
+        const data = await response.json()
+        setEquipment(data)
+      }
+    } catch (error) {
+      console.error("Erreur lors du chargement du matériel:", error)
+    }
+  }, [setEquipment, search, selectedType]); // Dependencies
+
+  const loadData = useCallback(async () => {
+    setLoading(true)
+    await Promise.all([
+      fetchEquipment(),
+      fetchEquipmentTypes(),
+      fetchUsers()
+    ])
+    setLoading(false)
+  }, [setLoading, setEquipment, setEquipmentTypes, setUsers, debouncedSearch, selectedType]);
 
   useEffect(() => {
-    const fetchEquipment = async () => {
-      try {
-        const params = new URLSearchParams()
-        if (debouncedSearch) params.append("search", debouncedSearch)
-        if (selectedType) params.append("type", selectedType)
-
-        const response = await fetch(`/api/equipment?${params}`)
-        if (response.ok) {
-          const data = await response.json()
-          setEquipment(data)
-        }
-      } catch (error) {
-        console.error("Erreur lors du chargement du matériel:", error)
-      }
-    }
-
-    const loadData = async () => {
-      setLoading(true)
-      await Promise.all([fetchEquipment(), fetchEquipmentTypes(), fetchUsers()]) // Fetch users here
-      setLoading(false)
-    }
     loadData()
-  }, [debouncedSearch, selectedType]) // Use debouncedSearch here
+  }, [loadData])
 
   const handleEdit = (equipment: Equipment) => {
     setEditingEquipment(equipment)
@@ -125,7 +108,7 @@ export function EquipmentList() {
           method: "DELETE",
         })
         if (response.ok) {
-          fetchEquipment()
+          loadData()
         }
       } catch (error) {
         console.error("Erreur lors de la suppression:", error)
@@ -136,7 +119,7 @@ export function EquipmentList() {
   const handleFormSuccess = () => {
     setShowForm(false)
     setEditingEquipment(null)
-    fetchEquipment()
+    loadData()
   }
 
   const handleFormCancel = () => {

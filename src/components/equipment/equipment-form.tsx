@@ -3,26 +3,7 @@
 import { useState, useEffect } from "react"
 import { useSession } from "next-auth/react" // Import useSession
 import { isAdmin } from "@/lib/permissions" // Import isAdmin
-
-interface Equipment {
-  id: string
-  reference?: string
-  sector: string
-  room: string
-  resident: string
-  deliveryDate?: string
-  returnDate?: string
-  type: {
-    id: string
-    name: string
-  }
-  userId: string; // Add userId to Equipment interface
-}
-
-interface EquipmentType {
-  id: string
-  name: string
-}
+import { Equipment, EquipmentType } from "@/types/equipment";
 
 interface User { // Define User interface
   id: string;
@@ -99,6 +80,9 @@ export function EquipmentForm({ equipment, equipmentTypes, users, onSuccess, onC
             sector: "",
             room: "",
             resident: "",
+            deliveryDate: "", // Add this
+            returnDate: "",  // Add this
+            userId: "",      // Add this
           })
         }
       } else {

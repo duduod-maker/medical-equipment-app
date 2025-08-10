@@ -6,7 +6,7 @@ import { isAdmin } from "@/lib/permissions"
 
 export async function GET(
   request: Request,
-  { params }: { params: { id: string } }
+  context: any
 ) {
   try {
     const session = await getServerSession(authOptions)
@@ -14,7 +14,7 @@ export async function GET(
       return NextResponse.json({ error: "Non autorisé" }, { status: 401 })
     }
 
-    const { id } = params
+    const id = context.params.id;
 
     const equipmentType = await prisma.equipmentType.findUnique({
       where: { id },
@@ -36,7 +36,7 @@ export async function GET(
 
 export async function PUT(
   request: Request,
-  { params }: { params: { id: string } }
+  context: any
 ) {
   try {
     const session = await getServerSession(authOptions)
@@ -44,7 +44,7 @@ export async function PUT(
       return NextResponse.json({ error: "Accès refusé" }, { status: 403 })
     }
 
-    const { id } = params
+    const id = context.params.id;
     const body = await request.json()
     const { name } = body
 
@@ -65,7 +65,7 @@ export async function PUT(
 
 export async function DELETE(
   request: Request,
-  { params }: { params: { id: string } }
+  context: any
 ) {
   try {
     const session = await getServerSession(authOptions)
@@ -73,7 +73,7 @@ export async function DELETE(
       return NextResponse.json({ error: "Accès refusé" }, { status: 403 })
     }
 
-    const { id } = params
+    const id = context.params.id;
 
     await prisma.equipmentType.delete({
       where: { id },

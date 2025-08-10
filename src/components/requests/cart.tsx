@@ -4,30 +4,12 @@ import { useState, useEffect } from "react"
 import { EquipmentSearchSelect } from "../equipment/EquipmentSearchSelect" // Import the new component
 import { useSession } from "next-auth/react"; // Import useSession
 import { isAdmin } from "@/lib/permissions"; // Import isAdmin
-
-interface EquipmentType {
-  id: string;
-  name: string;
-}
-
-interface Equipment {
-  id: string;
-  reference?: string;
-  sector: string;
-  room: string;
-  resident: string;
-  deliveryDate?: string; // Assuming date comes as string
-  returnDate?: string; // Assuming date comes as string
-  typeId: string;
-  type: EquipmentType;
-  userId: string;
-  user: { name: string; email: string }; // Simplified user for now
-}
+import { Equipment, EquipmentType } from "@/types/equipment";
 
 interface CartItem {
   id?: string; // Add id property
   type: "DELIVERY" | "PICKUP" | "REPAIR"
-  description: string
+  description?: string // Make description optional
   equipmentId?: string
   equipmentInfo?: string
   userId?: string;

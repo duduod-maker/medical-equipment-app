@@ -21,6 +21,7 @@ interface Request {
       type: { name: string }
       resident: string
       sector: string
+      room: string // Add this line
       reference?: string
     }
   }>
