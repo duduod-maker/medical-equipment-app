@@ -40,7 +40,8 @@ export async function GET(request: Request) {
     })
 
     return NextResponse.json(requests)
-  } catch (error) {
+  } catch (error: unknown) {
+    console.error("Erreur lors de la récupération des demandes:", error);
     return NextResponse.json(
       { error: "Erreur lors de la récupération des demandes" },
       { status: 500 }
@@ -76,7 +77,8 @@ export async function POST(request: Request) {
     })
 
     return NextResponse.json(requestData)
-  } catch (_error) {
+  } catch (error: unknown) {
+    console.error("Erreur lors de la soumission de la demande:", error);
     return NextResponse.json(
       { error: "Erreur lors de la soumission de la demande" },
       { status: 500 }

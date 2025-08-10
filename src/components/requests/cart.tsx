@@ -73,7 +73,7 @@ export function Cart({ users }: CartProps) { // Accept users prop
   }
 
   const addToCart = (item: CartItem) => {
-    setCartItems([...cartItems, { ...item, id: Date.now().toString() } as any])
+    setCartItems([...cartItems, { ...item, id: Date.now().toString() }])
   }
 
   const removeFromCart = (index: number) => {
@@ -104,7 +104,8 @@ export function Cart({ users }: CartProps) { // Accept users prop
       } else {
         alert("Erreur lors de la soumission de la demande")
       }
-    } catch (_error) {
+    } catch (error: unknown) {
+      console.error("Erreur lors de la soumission de la demande:", error);
       alert("Erreur lors de la soumission de la demande")
     } finally {
       setLoading(false)

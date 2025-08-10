@@ -39,7 +39,8 @@ export async function PUT(
     })
 
     return NextResponse.json(updatedRequest)
-  } catch (_error) {
+  } catch (error: unknown) {
+    console.error("Erreur lors de la mise à jour de la demande:", error);
     return NextResponse.json(
       { error: "Erreur lors de la mise à jour de la demande" }, // Changed error message
       { status: 500 }
@@ -74,7 +75,8 @@ export async function DELETE(
     })
 
     return NextResponse.json({ message: "Demande supprimée avec succès" })
-  } catch (_error) {
+  } catch (error: unknown) {
+    console.error("Erreur lors de la suppression de la demande:", error);
     return NextResponse.json(
       { error: "Erreur lors de la suppression de la demande" },
       { status: 500 }

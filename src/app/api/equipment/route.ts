@@ -37,7 +37,8 @@ export async function GET(request: Request) {
     })
 
     return NextResponse.json(equipment)
-  } catch (_error) {
+  } catch (error: unknown) {
+    console.error("Erreur lors de la récupération du matériel:", error);
     return NextResponse.json(
       { error: "Erreur lors de la récupération du matériel" },
       { status: 500 }
@@ -73,7 +74,8 @@ export async function POST(request: Request) {
     })
 
     return NextResponse.json(equipment)
-  } catch (_error) {
+  } catch (error: unknown) {
+    console.error("Erreur lors de la création du matériel:", error);
     return NextResponse.json(
       { error: "Erreur lors de la création du matériel" },
       { status: 500 }
