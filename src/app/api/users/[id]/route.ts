@@ -4,7 +4,7 @@ import bcrypt from "bcryptjs";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { isAdmin } from "@/lib/permissions";
-import { Role } from "@prisma/client";
+import { Role, Prisma } from "@prisma/client";
 
 export async function PUT(req: Request, { params }: { params: { id: string } }) {
   const session = await getServerSession(authOptions);
@@ -18,7 +18,7 @@ export async function PUT(req: Request, { params }: { params: { id: string } }) 
   const { email, name, password, role } = body;
 
   try {
-    const dataToUpdate: any = {};
+    const dataToUpdate: Prisma.UserUpdateInput = {};
     if (email) dataToUpdate.email = email;
     if (name) dataToUpdate.name = name;
     if (role) dataToUpdate.role = role as Role;

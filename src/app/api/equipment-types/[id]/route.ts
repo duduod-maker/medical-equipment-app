@@ -25,7 +25,7 @@ export async function GET(
     }
 
     return NextResponse.json(equipmentType)
-  } catch (error) {
+  } catch (_error) {
     return NextResponse.json(
       { error: "Erreur lors de la récupération du type de matériel" },
       { status: 500 }
@@ -53,7 +53,7 @@ export async function PUT(
     })
 
     return NextResponse.json(updatedEquipmentType)
-  } catch (error) {
+  } catch (_error) {
     return NextResponse.json(
       { error: "Erreur lors de la mise à jour du type de matériel" },
       { status: 500 }
@@ -78,7 +78,7 @@ export async function DELETE(
     })
 
     return NextResponse.json({ message: "Type de matériel supprimé" })
-  } catch (error) {
+  } catch (_error) {
     return NextResponse.json(
       { error: "Erreur lors de la suppression du type de matériel" },
       { status: 500 }

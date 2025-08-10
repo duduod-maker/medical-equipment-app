@@ -114,7 +114,7 @@ export function EquipmentForm({ equipment, equipmentTypes, users, onSuccess, onC
   return (
     <div>
       <h3 className="text-lg font-medium text-gray-900 mb-4">
-        {equipment ? "Modifier l'équipement" : "Ajouter un équipement"}
+        {equipment ? "Modifier l&apos;équipement" : "Ajouter un équipement"}
       </h3>
 
       <form onSubmit={handleSubmit} className="space-y-4">
@@ -223,7 +223,7 @@ export function EquipmentForm({ equipment, equipmentTypes, users, onSuccess, onC
           {isAdmin(session) && ( // Only show user selection for admins
             <div>
               <label htmlFor="userId" className="block text-sm font-medium text-gray-700">
-                Assigner à l'utilisateur *
+                Assigner à l&apos;utilisateur *
               </label>
               <select
                 id="userId"

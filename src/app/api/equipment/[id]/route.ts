@@ -90,7 +90,7 @@ export async function DELETE(
     })
 
     return NextResponse.json({ message: "Matériel supprimé avec succès" })
-  } catch (error) {
+  } catch (_error) {
     return NextResponse.json(
       { error: "Erreur lors de la suppression du matériel" },
       { status: 500 }

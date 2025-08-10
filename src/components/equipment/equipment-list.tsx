@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react"
+import { useState, useEffect } from "react"
 import { useSession } from "next-auth/react"
 import { EquipmentForm } from "./equipment-form"
 import { EquipmentItem } from "./equipment-item"
@@ -64,22 +64,6 @@ export function EquipmentList() {
   const [showForm, setShowForm] = useState(false)
   const [editingEquipment, setEditingEquipment] = useState<Equipment | null>(null)
 
-  const fetchEquipment = async () => {
-    try {
-      const params = new URLSearchParams()
-      if (debouncedSearch) params.append("search", debouncedSearch)
-      if (selectedType) params.append("type", selectedType)
-
-      const response = await fetch(`/api/equipment?${params}`)
-      if (response.ok) {
-        const data = await response.json()
-        setEquipment(data)
-      }
-    } catch (error) {
-      console.error("Erreur lors du chargement du matériel:", error)
-    }
-  }
-
   const fetchEquipmentTypes = async () => {
     try {
       const response = await fetch("/api/equipment-types")
@@ -105,6 +89,22 @@ export function EquipmentList() {
   }
 
   useEffect(() => {
+    const fetchEquipment = async () => {
+      try {
+        const params = new URLSearchParams()
+        if (debouncedSearch) params.append("search", debouncedSearch)
+        if (selectedType) params.append("type", selectedType)
+
+        const response = await fetch(`/api/equipment?${params}`)
+        if (response.ok) {
+          const data = await response.json()
+          setEquipment(data)
+        }
+      } catch (error) {
+        console.error("Erreur lors du chargement du matériel:", error)
+      }
+    }
+
     const loadData = async () => {
       setLoading(true)
       await Promise.all([fetchEquipment(), fetchEquipmentTypes(), fetchUsers()]) // Fetch users here

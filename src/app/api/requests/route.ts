@@ -3,6 +3,13 @@ import { getServerSession } from "next-auth"
 import { prisma } from "@/lib/prisma"
 import { authOptions } from "@/lib/auth"
 import { isAdmin } from "@/lib/permissions"
+import { RequestType } from "@prisma/client"
+
+interface RequestItemInput {
+  type: RequestType;
+  description?: string;
+  equipmentId?: string | null;
+}
 
 export async function GET(request: Request) {
   try {
@@ -59,7 +66,7 @@ export async function POST(request: Request) {
         notes,
         userId: requestUserId, // Use determined userId
         items: {
-          create: items.map((item: any) => ({
+          create: items.map((item: RequestItemInput) => ({
             type: item.type,
             description: item.description,
             equipmentId: item.equipmentId || null,
@@ -69,7 +76,7 @@ export async function POST(request: Request) {
     })
 
     return NextResponse.json(requestData)
-  } catch (error) {
+  } catch (_error) {
     return NextResponse.json(
       { error: "Erreur lors de la soumission de la demande" },
       { status: 500 }

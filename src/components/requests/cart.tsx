@@ -5,12 +5,32 @@ import { EquipmentSearchSelect } from "../equipment/EquipmentSearchSelect" // Im
 import { useSession } from "next-auth/react"; // Import useSession
 import { isAdmin } from "@/lib/permissions"; // Import isAdmin
 
+interface EquipmentType {
+  id: string;
+  name: string;
+}
+
+interface Equipment {
+  id: string;
+  reference?: string;
+  sector: string;
+  room: string;
+  resident: string;
+  deliveryDate?: string; // Assuming date comes as string
+  returnDate?: string; // Assuming date comes as string
+  typeId: string;
+  type: EquipmentType;
+  userId: string;
+  user: { name: string; email: string }; // Simplified user for now
+}
+
 interface CartItem {
+  id?: string; // Add id property
   type: "DELIVERY" | "PICKUP" | "REPAIR"
   description: string
   equipmentId?: string
   equipmentInfo?: string
-  userId?: string; // Add userId to CartItem interface
+  userId?: string;
 }
 
 const REQUEST_TYPES = {
@@ -34,7 +54,7 @@ export function Cart({ users }: CartProps) { // Accept users prop
   const [cartItems, setCartItems] = useState<CartItem[]>([])
   const [notes, setNotes] = useState("")
   const [loading, setLoading] = useState(false)
-  const [equipment, setEquipment] = useState<any[]>([])
+  const [equipment, setEquipment] = useState<Equipment[]>([])
 
   useEffect(() => {
     fetchEquipment()
@@ -84,7 +104,7 @@ export function Cart({ users }: CartProps) { // Accept users prop
       } else {
         alert("Erreur lors de la soumission de la demande")
       }
-    } catch (error) {
+    } catch (_error) {
       alert("Erreur lors de la soumission de la demande")
     } finally {
       setLoading(false)
@@ -166,7 +186,7 @@ export function Cart({ users }: CartProps) { // Accept users prop
 
 interface NewRequestFormProps {
   onAdd: (item: CartItem) => void
-  equipment: any[]
+  equipment: Equipment[]
   users: User[]; // Add users prop
 }
 
@@ -245,7 +265,7 @@ function NewRequestForm({ onAdd, equipment, users }: NewRequestFormProps) { // A
       {isAdmin(session) && ( // Only show user selection for admins
         <div>
           <label htmlFor="userId" className="block text-sm font-medium text-gray-700">
-            Assigner à l'utilisateur *
+            Assigner à l&apos;utilisateur *
           </label>
           <select
             id="userId"
