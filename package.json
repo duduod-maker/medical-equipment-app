@@ -10,7 +10,8 @@
     "lint": "next lint",
     "db:migrate": "prisma migrate dev",
     "db:seed": "tsx src/scripts/seed.ts",
-    "db:reset": "prisma migrate reset --force && npm run db:seed"
+    "db:reset": "prisma migrate reset --force && npm run db:seed",
+    "migrate:deploy": "npx prisma migrate deploy"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.1",
