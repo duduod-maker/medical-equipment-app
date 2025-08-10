@@ -236,7 +236,7 @@ export function RequestsList() {
                 value={editableNotes[request.id] !== undefined ? editableNotes[request.id] : request.notes || ""}
                 onChange={(e) => handleNotesChange(request.id, e.target.value)}
                 className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-gray-900"
-                disabled={!canManageRequest(session, request.userId)} // Disable if not authorized
+                disabled={!canManageRequest(session, request.user)} // Disable if not authorized
               />
               {canManageRequest(session, request.userId) && editableNotes[request.id] !== undefined && editableNotes[request.id] !== request.notes && (
                 <button

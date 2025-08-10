@@ -15,7 +15,7 @@ export async function PUT(
       return NextResponse.json({ error: "Non autorisé" }, { status: 401 })
     }
 
-    const id = context.params.id;
+    const requestId = params.id;
     const body = await request.json()
     const { status, notes } = body // Add notes
 

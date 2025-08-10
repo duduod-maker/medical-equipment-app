@@ -6,9 +6,9 @@ import { canManageEquipment, isAdmin } from "@/lib/permissions"
 
 export async function PUT(
   request: Request,
-  context: any
+  context: { params: { id: string } }
 ) {
-  const { id } = context.params; // Access id directly
+  const { id } = context.params;
   try {
     const session = await getServerSession(authOptions)
     if (!session) {
@@ -53,7 +53,7 @@ export async function PUT(
 
     return NextResponse.json(updatedEquipment)
   } catch (error) {
-    console.error("Error updating equipment:", error); // Add detailed error logging
+    console.error("Error updating equipment:", error);
     return NextResponse.json(
       { error: "Erreur lors de la mise à jour de l'équipement" },
       { status: 500 }
@@ -63,9 +63,9 @@ export async function PUT(
 
 export async function DELETE(
   request: Request,
-  context: any
+  context: { params: { id: string } }
 ) {
-  const { id } = context.params; // Access id directly
+  const { id } = context.params;
   try {
     const session = await getServerSession(authOptions)
     if (!session) {
@@ -89,7 +89,7 @@ export async function DELETE(
     })
 
     return NextResponse.json({ message: "Matériel supprimé avec succès" })
-  } catch (error: unknown) {
+  } catch (error) { // Supprime ": unknown"
     console.error("Error deleting equipment:", error);
     return NextResponse.json(
       { error: "Erreur lors de la suppression du matériel" },
