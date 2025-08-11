@@ -26,7 +26,7 @@ export async function GET(request: Request) {
     const requests = await prisma.request.findMany({
       where,
       include: {
-        user: { select: { name: true, email: true } },
+        user: { select: { id: true, name: true, email: true } },
         items: {
           include: {
             equipment: {
