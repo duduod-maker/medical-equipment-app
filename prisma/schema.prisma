@@ -88,6 +88,14 @@ model RequestItem {
   @@map("request_items")
 }
 
+model Setting {
+  id    String @id @default(cuid())
+  key   String @unique
+  value String
+
+  @@map("settings")
+}
+
 enum Role {
   USER
   ADMIN

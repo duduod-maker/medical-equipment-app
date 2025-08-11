@@ -39,7 +39,7 @@ export function EquipmentItem({ equipment, onEdit, onDelete, showUser }: Equipme
     addToCart({
       type: requestType,
       equipmentId: equipment.id,
-      equipmentInfo: `${equipment.type.name} - ${equipment.reference}`,
+      equipmentInfo: `${equipment.type.name} - ${equipment.reference} - Résident: ${equipment.resident} - Chambre: ${equipment.room}`,
     });
     alert(`${equipment.type.name} a été ajouté au panier.`);
     handleCloseModal();

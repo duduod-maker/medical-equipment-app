@@ -5,7 +5,7 @@ import { signIn } from "next-auth/react"
 import { useRouter } from "next/navigation"
 
 export default function LoginPage() {
-  const [email, setEmail] = useState("")
+  const [name, setName] = useState("") // Changed from email to name
   const [password, setPassword] = useState("")
   const [error, setError] = useState("")
   const [loading, setLoading] = useState(false)
@@ -17,13 +17,13 @@ export default function LoginPage() {
     setError("")
 
     const result = await signIn("credentials", {
-      email,
+      name, // Changed from email to name
       password,
       redirect: false,
     })
 
     if (result?.error) {
-      setError("Email ou mot de passe incorrect")
+      setError("Nom d'utilisateur ou mot de passe incorrect") // Updated error message
     } else {
       router.push("/")
       router.refresh()
@@ -47,12 +47,12 @@ export default function LoginPage() {
           <div className="rounded-md shadow-sm -space-y-px">
             <div>
               <input
-                type="email"
+                type="text" // Changed from email to text
                 required
                 className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                placeholder="Adresse email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                placeholder="Nom d'utilisateur" // Changed placeholder
+                value={name}
+                onChange={(e) => setName(e.target.value)} // Changed to setName
               />
             </div>
             <div>

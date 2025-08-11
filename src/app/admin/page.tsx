@@ -5,6 +5,7 @@ import { UserForm } from "@/components/admin/user-form";
 import { UserList } from "@/components/admin/user-list";
 import { Header } from "@/components/layout/header";
 import { EquipmentTypeManager } from "@/components/admin/EquipmentTypeManager"; // Import the new component
+import { EmailSettings } from "@/components/admin/EmailSettings";
 
 export default async function AdminPage() {
   const session = await getServerSession(authOptions);
@@ -23,6 +24,7 @@ export default async function AdminPage() {
           <UserList />
           <div className="mt-8"> {/* Add some margin for separation */}
             <EquipmentTypeManager />
+            <EmailSettings />
           </div>
         </div>
       </main>

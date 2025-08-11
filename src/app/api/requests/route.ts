@@ -91,41 +91,46 @@ export async function POST(request: Request) {
 
     // --- Email sending logic ---
     try {
-      const admins = await prisma.user.findMany({
-        where: { role: Role.ADMIN },
-      });
-      const adminEmails = admins.map(admin => admin.email);
-      const userEmail = newRequest.user.email;
-
-      const allRecipients = [...new Set([...adminEmails, userEmail])];
-
-      const transporter = nodemailer.createTransport({
-        host: process.env.EMAIL_SERVER_HOST,
-        port: Number(process.env.EMAIL_SERVER_PORT),
-        secure: Number(process.env.EMAIL_SERVER_PORT) === 465,
-        auth: {
-          user: process.env.EMAIL_SERVER_USER,
-          pass: process.env.EMAIL_SERVER_PASSWORD,
-        },
+      const emailSetting = await prisma.setting.findUnique({
+        where: { key: 'email_notifications' },
       });
 
-      const REQUEST_TYPE_FR = {
-        DELIVERY: "Livraison",
-        PICKUP: "Reprise",
-        REPAIR: "Dépannage",
-      };
+      if (emailSetting && emailSetting.value === 'true') {
+        const admins = await prisma.user.findMany({
+          where: { role: Role.ADMIN },
+        });
+        const adminEmails = admins.map(admin => admin.email);
+        const userEmail = newRequest.user.email;
 
-      const itemsHtml = newRequest.items.map(item => {
-        const equipmentDetails = item.equipment
-          ? `
+        const allRecipients = [...new Set([...adminEmails, userEmail])];
+
+        const transporter = nodemailer.createTransport({
+          host: process.env.EMAIL_SERVER_HOST,
+          port: Number(process.env.EMAIL_SERVER_PORT),
+          secure: Number(process.env.EMAIL_SERVER_PORT) === 465,
+          auth: {
+            user: process.env.EMAIL_SERVER_USER,
+            pass: process.env.EMAIL_SERVER_PASSWORD,
+          },
+        });
+
+        const REQUEST_TYPE_FR = {
+          DELIVERY: "Livraison",
+          PICKUP: "Reprise",
+          REPAIR: "Dépannage",
+        };
+
+        const itemsHtml = newRequest.items.map(item => {
+          const equipmentDetails = item.equipment
+            ? `
             <p style="margin: 0; padding-left: 10px;">
               <strong>Équipement :</strong> ${item.equipment.type.name} - ${item.equipment.resident}<br>
               <strong>Secteur :</strong> ${item.equipment.sector}<br>
               <strong>Chambre :</strong> ${item.equipment.room}
             </p>`
-          : '';
+            : '';
 
-        return `
+          return `
           <tr>
             <td style="padding: 10px; border-bottom: 1px solid #ddd;">
               <p style="margin: 0;"><strong>Type :</strong> ${REQUEST_TYPE_FR[item.type]}</p>
@@ -133,13 +138,13 @@ export async function POST(request: Request) {
               ${equipmentDetails}
             </td>
           </tr>`;
-      }).join('');
+        }).join('');
 
-      const mailOptions = {
-        from: process.env.EMAIL_FROM,
-        to: allRecipients.join(','),
-        subject: `Nouvelle demande de matériel #${newRequest.id}`,
-        html: `
+        const mailOptions = {
+          from: process.env.EMAIL_FROM,
+          to: allRecipients.join(','),
+          subject: `Nouvelle demande de matériel #${newRequest.id}`,
+          html: `
           <div style="font-family: Arial, sans-serif; color: #333;">
             <h1 style="color: #0056b3;">Nouvelle demande de matériel</h1>
             <p>Une nouvelle demande a été créée par <strong>${newRequest.user.name}</strong> (${newRequest.user.email}).</p>
@@ -161,10 +166,13 @@ export async function POST(request: Request) {
             </p>
           </div>
         `,
-      };
+        };
 
-      await transporter.sendMail(mailOptions);
-      console.log("Email sent successfully");
+        await transporter.sendMail(mailOptions);
+        console.log("Email sent successfully");
+      } else {
+        console.log("Email notifications are disabled.");
+      }
 
     } catch (emailError) {
       console.error("Failed to send email:", emailError);

@@ -49,6 +49,15 @@ async function main() {
     })
   }
 
+  await prisma.setting.upsert({
+    where: { key: 'email_notifications' },
+    update: {},
+    create: {
+      key: 'email_notifications',
+      value: 'true',
+    },
+  });
+
   console.log("Database seeded successfully!")
   console.log("Admin: admin@example.com / admin123")
   console.log("User: user@example.com / user123")
