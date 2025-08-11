@@ -1,15 +1,16 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { EquipmentSearchSelect } from "../equipment/EquipmentSearchSelect" // Import the new component
-import { useSession } from "next-auth/react"; // Import useSession
-import { isAdmin } from "@/lib/permissions"; // Import isAdmin
-import { Equipment, EquipmentType } from "@/types/equipment";
+import { EquipmentSearchSelect } from "../equipment/EquipmentSearchSelect"
+import { useSession } from "next-auth/react";
+import { isAdmin } from "@/lib/permissions";
+import { Equipment } from "@/types/equipment";
+import { useCart } from "@/context/CartContext";
 
 interface CartItem {
-  id?: string; // Add id property
+  id?: string;
   type: "DELIVERY" | "PICKUP" | "REPAIR"
-  description?: string // Make description optional
+  description?: string
   equipmentId?: string
   equipmentInfo?: string
   userId?: string;
@@ -21,7 +22,7 @@ const REQUEST_TYPES = {
   REPAIR: "Dépannage",
 }
 
-interface User { // Define User interface
+interface User {
   id: string;
   email: string;
   name?: string;
@@ -29,11 +30,11 @@ interface User { // Define User interface
 }
 
 interface CartProps {
-  users: User[]; // Add users prop
+  users: User[];
 }
 
-export function Cart({ users }: CartProps) { // Accept users prop
-  const [cartItems, setCartItems] = useState<CartItem[]>([])
+export function Cart({ users }: CartProps) {
+  const { cartItems, addToCart, removeFromCart, clearCart } = useCart();
   const [notes, setNotes] = useState("")
   const [loading, setLoading] = useState(false)
   const [equipment, setEquipment] = useState<Equipment[]>([])
@@ -54,14 +55,6 @@ export function Cart({ users }: CartProps) { // Accept users prop
     }
   }
 
-  const addToCart = (item: CartItem) => {
-    setCartItems([...cartItems, { ...item, id: Date.now().toString() }])
-  }
-
-  const removeFromCart = (index: number) => {
-    setCartItems(cartItems.filter((_, i) => i !== index))
-  }
-
   const submitRequest = async () => {
     if (cartItems.length === 0) return
 
@@ -79,7 +72,7 @@ export function Cart({ users }: CartProps) { // Accept users prop
       })
 
       if (response.ok) {
-        setCartItems([])
+        clearCart()
         setNotes("")
         alert("Demande soumise avec succès!")
         window.location.reload()
@@ -101,7 +94,7 @@ export function Cart({ users }: CartProps) { // Accept users prop
       </h2>
 
       <div className="space-y-4 mb-6">
-        <NewRequestForm onAdd={addToCart} equipment={equipment} users={users} /> {/* Pass users to NewRequestForm */}
+        <NewRequestForm onAdd={addToCart} equipment={equipment} users={users} />
       </div>
 
       {cartItems.length > 0 && (
@@ -113,7 +106,7 @@ export function Cart({ users }: CartProps) { // Accept users prop
             <div className="space-y-3">
               {cartItems.map((item, index) => (
                 <div
-                  key={index}
+                  key={item.id || index}
                   className="flex justify-between items-start bg-gray-50 p-3 rounded"
                 >
                   <div className="flex-1">
@@ -130,7 +123,7 @@ export function Cart({ users }: CartProps) { // Accept users prop
                     )}
                   </div>
                   <button
-                    onClick={() => removeFromCart(index)}
+                    onClick={() => removeFromCart(item.id!)}
                     className="text-red-600 hover:text-red-800 text-sm ml-2"
                   >
                     Retirer
@@ -168,21 +161,21 @@ export function Cart({ users }: CartProps) { // Accept users prop
 }
 
 interface NewRequestFormProps {
-  onAdd: (item: CartItem) => void
+  onAdd: (item: Omit<CartItem, 'id'>) => void
   equipment: Equipment[]
-  users: User[]; // Add users prop
+  users: User[];
 }
 
-function NewRequestForm({ onAdd, equipment, users }: NewRequestFormProps) { // Accept users prop
-  const { data: session } = useSession(); // Get session data
+function NewRequestForm({ onAdd, equipment, users }: NewRequestFormProps) {
+  const { data: session } = useSession();
   const [type, setType] = useState<CartItem["type"]>("DELIVERY")
   const [description, setDescription] = useState("")
   const [selectedEquipmentId, setSelectedEquipmentId] = useState("")
-  const [selectedUserId, setSelectedUserId] = useState(""); // New state for userId
+  const [selectedUserId, setSelectedUserId] = useState("");
 
   useEffect(() => {
     if (users.length > 0 && isAdmin(session)) {
-      setSelectedUserId(users[0].id); // Set default user to the first one if admin
+      setSelectedUserId(users[0].id);
     }
   }, [users, session]);
 
@@ -196,16 +189,16 @@ function NewRequestForm({ onAdd, equipment, users }: NewRequestFormProps) { // A
 
     onAdd({
       type,
-      description: description || undefined, // Pass undefined if empty
+      description: description || undefined,
       equipmentId: selectedEquipmentId || undefined,
       equipmentInfo,
-      userId: isAdmin(session) && selectedUserId ? selectedUserId : undefined, // Add userId to CartItem
+      userId: isAdmin(session) && selectedUserId ? selectedUserId : undefined,
     })
 
     setDescription("")
     setSelectedEquipmentId("")
     if (isAdmin(session) && users.length > 0) {
-      setSelectedUserId(users[0].id); // Reset to default user if admin
+      setSelectedUserId(users[0].id);
     }
   }
 
@@ -234,9 +227,9 @@ function NewRequestForm({ onAdd, equipment, users }: NewRequestFormProps) { // A
           </label>
           <EquipmentSearchSelect 
             equipment={equipment} 
-            onSelect={(selectedEq) => { // Receive the full equipment object
+            onSelect={(selectedEq) => {
               setSelectedEquipmentId(selectedEq.id);
-              if (isAdmin(session)) { // Only update userId if admin
+              if (isAdmin(session)) {
                 setSelectedUserId(selectedEq.userId);
               }
             }} 
@@ -245,7 +238,7 @@ function NewRequestForm({ onAdd, equipment, users }: NewRequestFormProps) { // A
         </div>
       )}
 
-      {isAdmin(session) && ( // Only show user selection for admins
+      {isAdmin(session) && (
         <div>
           <label htmlFor="userId" className="block text-sm font-medium text-gray-700">
             Assigner à l&apos;utilisateur *
