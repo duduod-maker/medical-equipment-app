@@ -19,9 +19,9 @@ export async function GET(request: Request) {
       ...(isAdmin(session) ? {} : { userId: session.user.id }),
       ...(search && {
         OR: [
-          { reference: { contains: search } },
-          { resident: { contains: search } },
-          { sector: { contains: search } },
+          { reference: { contains: search, mode: 'insensitive' } },
+          { resident: { contains: search, mode: 'insensitive' } },
+          { sector: { contains: search, mode: 'insensitive' } },
         ],
       }),
       ...(type !== '' && { typeId: { equals: type } }),
