@@ -15,9 +15,8 @@ export async function PUT(
       return NextResponse.json({ error: "Non autorisé" }, { status: 401 })
     }
 
-    const requestId = params.id;
     const body = await request.json()
-    const { status, notes } = body // Add notes
+    const { status, notes } = body
 
     const existingRequest = await prisma.request.findUnique({
       where: { id },
@@ -31,19 +30,24 @@ export async function PUT(
       return NextResponse.json({ error: "Accès refusé" }, { status: 403 })
     }
 
+    const dataToUpdate: { status?: any; notes?: string } = {};
+    if (status) {
+      dataToUpdate.status = status;
+    }
+    if (notes !== undefined) {
+      dataToUpdate.notes = notes;
+    }
+
     const updatedRequest = await prisma.request.update({
       where: { id },
-      data: {
-        status,
-        notes, // Update notes
-      },
+      data: dataToUpdate,
     })
 
     return NextResponse.json(updatedRequest)
   } catch (error: unknown) {
     console.error("Erreur lors de la mise à jour de la demande:", error);
     return NextResponse.json(
-      { error: "Erreur lors de la mise à jour de la demande" }, // Changed error message
+      { error: "Erreur lors de la mise à jour de la demande" },
       { status: 500 }
     )
   }
