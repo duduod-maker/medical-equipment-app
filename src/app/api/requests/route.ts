@@ -99,40 +99,68 @@ export async function POST(request: Request) {
 
       const allRecipients = [...new Set([...adminEmails, userEmail])];
 
-      // Create a transporter object using the default SMTP transport
-      // You need to set up your environment variables for this to work
       const transporter = nodemailer.createTransport({
         host: process.env.EMAIL_SERVER_HOST,
         port: Number(process.env.EMAIL_SERVER_PORT),
-        secure: Number(process.env.EMAIL_SERVER_PORT) === 465, // true for 465, false for other ports
+        secure: Number(process.env.EMAIL_SERVER_PORT) === 465,
         auth: {
           user: process.env.EMAIL_SERVER_USER,
           pass: process.env.EMAIL_SERVER_PASSWORD,
         },
       });
 
-      const itemsHtml = newRequest.items.map(item => `
-        <li>
-          <b>Type:</b> ${item.type}<br/>
-          <b>Description:</b> ${item.description}<br/>
-          ${item.equipment ? `<b>Équipement:</b> ${item.equipment.type.name} - ${item.equipment.resident}<br/>` : ''}
-        </li>
-      `).join('');
+      const REQUEST_TYPE_FR = {
+        DELIVERY: "Livraison",
+        PICKUP: "Reprise",
+        REPAIR: "Dépannage",
+      };
+
+      const itemsHtml = newRequest.items.map(item => {
+        const equipmentDetails = item.equipment
+          ? `
+            <p style="margin: 0; padding-left: 10px;">
+              <strong>Équipement :</strong> ${item.equipment.type.name} - ${item.equipment.resident}<br>
+              <strong>Secteur :</strong> ${item.equipment.sector}<br>
+              <strong>Chambre :</strong> ${item.equipment.room}
+            </p>`
+          : '';
+
+        return `
+          <tr>
+            <td style="padding: 10px; border-bottom: 1px solid #ddd;">
+              <p style="margin: 0;"><strong>Type :</strong> ${REQUEST_TYPE_FR[item.type]}</p>
+              <p style="margin: 0;"><strong>Description :</strong> ${item.description || 'N/A'}</p>
+              ${equipmentDetails}
+            </td>
+          </tr>`;
+      }).join('');
 
       const mailOptions = {
-        from: process.env.EMAIL_FROM, // sender address
-        to: allRecipients.join(','), // list of receivers
-        subject: `Nouvelle demande de matériel #${newRequest.id}`, // Subject line
+        from: process.env.EMAIL_FROM,
+        to: allRecipients.join(','),
+        subject: `Nouvelle demande de matériel #${newRequest.id}`,
         html: `
-          <h1>Nouvelle demande de matériel</h1>
-          <p>Une nouvelle demande a été créée par ${newRequest.user.name} (${newRequest.user.email}).</p>
-          <h2>Détails de la demande:</h2>
-          <ul>
-            ${itemsHtml}
-          </ul>
-          <p><b>Notes:</b> ${newRequest.notes || 'Aucune'}</p>
-          <p>Vous pouvez consulter la demande sur le portail.</p>
-        `, // html body
+          <div style="font-family: Arial, sans-serif; color: #333;">
+            <h1 style="color: #0056b3;">Nouvelle demande de matériel</h1>
+            <p>Une nouvelle demande a été créée par <strong>${newRequest.user.name}</strong> (${newRequest.user.email}).</p>
+            <h2 style="color: #0056b3;">Détails de la demande</h2>
+            <table style="width: 100%; border-collapse: collapse;">
+              <thead>
+                <tr>
+                  <th style="padding: 10px; border-bottom: 2px solid #0056b3; text-align: left;">Détails</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${itemsHtml}
+              </tbody>
+            </table>
+            <h2 style="color: #0056b3;">Notes</h2>
+            <p>${newRequest.notes || 'Aucune'}</p>
+            <p style="margin-top: 20px; font-size: 0.9em; color: #555;">
+              Vous pouvez consulter la demande sur le portail.
+            </p>
+          </div>
+        `,
       };
 
       await transporter.sendMail(mailOptions);
