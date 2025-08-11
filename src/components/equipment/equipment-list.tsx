@@ -67,34 +67,32 @@ export function EquipmentList() {
   }, [setUsers]);
 
   const fetchEquipment = useCallback(async () => {
+    setLoading(true);
     try {
-      const params = new URLSearchParams()
-      if (search) params.append("search", search) // Use 'search' directly
-      if (selectedType) params.append("type", selectedType)
+      const params = new URLSearchParams();
+      if (debouncedSearch) params.append("search", debouncedSearch);
+      if (selectedType) params.append("type", selectedType);
 
-      const response = await fetch(`/api/equipment?${params}`)
+      const response = await fetch(`/api/equipment?${params}`);
       if (response.ok) {
-        const data = await response.json()
-        setEquipment(data)
+        const data = await response.json();
+        setEquipment(data);
       }
     } catch (error) {
-      console.error("Erreur lors du chargement du matériel:", error)
+      console.error("Erreur lors du chargement du matériel:", error);
+    } finally {
+      setLoading(false);
     }
-  }, [setEquipment, search, selectedType]); // Dependencies
-
-  const loadData = useCallback(async () => {
-    setLoading(true)
-    await Promise.all([
-      fetchEquipment(),
-      fetchEquipmentTypes(),
-      fetchUsers()
-    ])
-    setLoading(false)
-  }, [setLoading, setEquipment, setEquipmentTypes, setUsers, debouncedSearch, selectedType]);
+  }, [debouncedSearch, selectedType, setEquipment]);
 
   useEffect(() => {
-    loadData()
-  }, [loadData])
+    fetchEquipmentTypes();
+    fetchUsers();
+  }, [fetchEquipmentTypes, fetchUsers]);
+
+  useEffect(() => {
+    fetchEquipment();
+  }, [fetchEquipment]);
 
   const handleEdit = (equipment: Equipment) => {
     setEditingEquipment(equipment)
@@ -108,7 +106,7 @@ export function EquipmentList() {
           method: "DELETE",
         })
         if (response.ok) {
-          loadData()
+          fetchEquipment()
         }
       } catch (error) {
         console.error("Erreur lors de la suppression:", error)
@@ -119,7 +117,7 @@ export function EquipmentList() {
   const handleFormSuccess = () => {
     setShowForm(false)
     setEditingEquipment(null)
-    loadData()
+    fetchEquipment()
   }
 
   const handleFormCancel = () => {
