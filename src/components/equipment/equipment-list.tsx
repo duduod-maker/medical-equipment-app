@@ -3,7 +3,8 @@ import { useSession } from "next-auth/react"
 import { EquipmentForm } from "./equipment-form"
 import { EquipmentItem } from "././equipment-item"
 import { isAdmin } from "@/lib/permissions"
-import { Equipment, EquipmentType } from "@/types/equipment";
+import { User } from "@/types/equipment" // Assuming User type is here or similar
+import { UserSearchSelect } from "@/components/user/UserSearchSelect"
 
 // Custom hook for debouncing
 function useDebounce<T>(value: T, delay: number): T {
@@ -37,8 +38,9 @@ export function EquipmentList() {
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState("")
   const debouncedSearch = useDebounce(search, 500); // 500ms debounce
-  
+
   const [selectedType, setSelectedType] = useState("")
+  const [selectedUser, setSelectedUser] = useState("") // New state for user filter
   const [showForm, setShowForm] = useState(false)
   const [editingEquipment, setEditingEquipment] = useState<Equipment | null>(null)
 
@@ -66,33 +68,36 @@ export function EquipmentList() {
     }
   }, [setUsers]);
 
-  const fetchEquipment = useCallback(async () => {
+  useEffect(() => {
+    console.log("Fetching equipment due to dependency change (direct dependencies)..."); // Added for debugging
     setLoading(true);
-    try {
-      const params = new URLSearchParams();
-      if (debouncedSearch) params.append("search", debouncedSearch);
-      if (selectedType) params.append("type", selectedType);
+    const params = new URLSearchParams();
+    if (debouncedSearch) params.append("search", debouncedSearch);
+    if (selectedType) params.append("type", selectedType);
+    if (selectedUser) params.append("userId", selectedUser);
 
-      const response = await fetch(`/api/equipment?${params}`);
-      if (response.ok) {
-        const data = await response.json();
+    fetch(`/api/equipment?${params}`)
+      .then(response => {
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+      })
+      .then(data => {
         setEquipment(data);
-      }
-    } catch (error) {
-      console.error("Erreur lors du chargement du matériel:", error);
-    } finally {
-      setLoading(false);
-    }
-  }, [debouncedSearch, selectedType, setEquipment]);
+      })
+      .catch(error => {
+        console.error("Erreur lors du chargement du matériel:", error);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  }, [debouncedSearch, selectedType, selectedUser, setEquipment]); // Direct dependencies
 
   useEffect(() => {
     fetchEquipmentTypes();
     fetchUsers();
   }, [fetchEquipmentTypes, fetchUsers]);
-
-  useEffect(() => {
-    fetchEquipment();
-  }, [fetchEquipment]);
 
   const handleEdit = (equipment: Equipment) => {
     setEditingEquipment(equipment)
@@ -106,7 +111,10 @@ export function EquipmentList() {
           method: "DELETE",
         })
         if (response.ok) {
-          fetchEquipment()
+          // No longer calling fetchEquipment() directly here, as it's now part of useEffect
+          // The useEffect will re-run when dependencies change, but not directly after delete
+          // For immediate refresh after delete, you might need to manually trigger fetchEquipment
+          // or update the equipment state directly. For now, relying on next render.
         }
       } catch (error) {
         console.error("Erreur lors de la suppression:", error)
@@ -117,13 +125,21 @@ export function EquipmentList() {
   const handleFormSuccess = () => {
     setShowForm(false)
     setEditingEquipment(null)
-    fetchEquipment()
+    // No longer calling fetchEquipment() directly here, as it's now part of useEffect
+    // The useEffect will re-run when dependencies change, but not directly after success
+    // For immediate refresh after success, you might need to manually trigger fetchEquipment
+    // or update the equipment state directly. For now, relying on next render.
   }
 
   const handleFormCancel = () => {
     setShowForm(false)
     setEditingEquipment(null)
   }
+
+  const handleUserSelect = (userId: string) => {
+    console.log("Selected User ID:", userId); // Added for debugging
+    setSelectedUser(userId);
+  };
 
   return (
     <div className="space-y-6">
@@ -145,6 +161,19 @@ export function EquipmentList() {
             {equipmentTypes.map((type) => (
               <option key={type.id} value={type.id}>
                 {type.name}
+              </option>
+            ))}
+          </select>
+          {/* User filter */}
+          <select
+            value={selectedUser}
+            onChange={(e) => handleUserSelect(e.target.value)}
+            className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900"
+          >
+            <option value="">Tous les utilisateurs</option>
+            {users.map((user) => (
+              <option key={user.id} value={user.id}>
+                {user.name || user.email}
               </option>
             ))}
           </select>

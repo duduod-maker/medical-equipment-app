@@ -8,7 +8,8 @@ export async function PUT(
   request: Request,
   context: { params: { id: string } }
 ) {
-  const { id } = context.params;
+  const { params } = await context; // Await context
+  const { id } = params;
   try {
     const session = await getServerSession(authOptions)
     if (!session) {
@@ -65,7 +66,8 @@ export async function DELETE(
   request: Request,
   context: { params: { id: string } }
 ) {
-  const { id } = context.params;
+  const { params } = await context; // Await context
+  const { id } = params;
   try {
     const session = await getServerSession(authOptions)
     if (!session) {

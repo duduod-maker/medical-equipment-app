@@ -14,9 +14,9 @@ export async function GET(request: Request) {
     const { searchParams } = new URL(request.url)
     const search = searchParams.get("search") || ""
     const type = searchParams.get("type") || ""
+    const filterUserId = searchParams.get("userId") || "" // Get userId from search params
 
-    const where = {
-      ...(isAdmin(session) ? {} : { userId: session.user.id }),
+    const where: any = {
       ...(search && {
         OR: [
           { reference: { contains: search, mode: 'insensitive' } },
@@ -25,6 +25,16 @@ export async function GET(request: Request) {
         ],
       }),
       ...(type !== '' && { typeId: { equals: type } }),
+    }
+
+    if (isAdmin(session)) {
+      // If admin, apply filterUserId if present, otherwise no user filter
+      if (filterUserId !== '') {
+        where.userId = { equals: filterUserId };
+      }
+    } else {
+      // If not admin, always filter by session user's ID
+      where.userId = { equals: session.user.id };
     }
 
     const equipment = await prisma.equipment.findMany({
