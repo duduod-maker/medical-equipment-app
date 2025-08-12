@@ -43,6 +43,7 @@ export function EquipmentList() {
   const [selectedUser, setSelectedUser] = useState("") // New state for user filter
   const [deliveryDateSearch, setDeliveryDateSearch] = useState("") // New state for delivery date search
   const [returnDateSearch, setReturnDateSearch] = useState("") // New state for return date search
+  const [showInStockOnly, setShowInStockOnly] = useState(false) // New state for in-stock filter
   const [showForm, setShowForm] = useState(false)
   const [editingEquipment, setEditingEquipment] = useState<Equipment | null>(null)
 
@@ -79,6 +80,7 @@ export function EquipmentList() {
     if (selectedUser) params.append("userId", selectedUser);
     if (deliveryDateSearch) params.append("deliveryDate", deliveryDateSearch); // Add deliveryDate to params
     if (returnDateSearch) params.append("returnDate", returnDateSearch);     // Add returnDate to params
+    if (showInStockOnly) params.append("inStock", "true"); // Add inStock to params
 
     fetch(`/api/equipment?${params}`)
       .then(response => {
@@ -96,7 +98,7 @@ export function EquipmentList() {
       .finally(() => {
         setLoading(false);
       });
-  }, [debouncedSearch, selectedType, selectedUser, deliveryDateSearch, returnDateSearch, setEquipment]); // Add new dependencies
+  }, [debouncedSearch, selectedType, selectedUser, deliveryDateSearch, returnDateSearch, showInStockOnly, setEquipment]); // Add new dependencies
 
   useEffect(() => {
     fetchEquipmentTypes();
@@ -151,7 +153,7 @@ export function EquipmentList() {
   return (
     <div className="space-y-6">
       <div className="bg-white p-6 rounded-lg shadow">
-        <div className="flex flex-col sm:flex-row gap-2 mb-4 items-center">
+        <div className="flex flex-col sm:flex-row gap-2 mb-4 items-center flex-wrap sm:justify-center">
           <input
             type="text"
             placeholder="Rechercher par référence, résident, secteur..."
@@ -199,6 +201,18 @@ export function EquipmentList() {
               ))}
             </select>
           )}
+          <div className="flex items-center no-print px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <input
+              type="checkbox"
+              id="showInStockOnly"
+              checked={showInStockOnly}
+              onChange={(e) => setShowInStockOnly(e.target.checked)}
+              className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+            />
+            <label htmlFor="showInStockOnly" className="ml-2 text-gray-700">
+              En stock
+            </label>
+          </div>
           <button
             onClick={() => setShowForm(true)}
             className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 no-print"

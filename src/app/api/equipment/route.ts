@@ -17,6 +17,7 @@ export async function GET(request: Request) {
     const filterUserId = searchParams.get("userId") || ""
     const deliveryDate = searchParams.get("deliveryDate") // New: Get deliveryDate
     const returnDate = searchParams.get("returnDate")     // New: Get returnDate
+    const inStock = searchParams.get("inStock") === "true" // New: Get inStock parameter
 
     const where: any = {
       ...(search && {
@@ -29,6 +30,7 @@ export async function GET(request: Request) {
       ...(type !== '' && { typeId: { equals: type } }),
       ...(deliveryDate && { deliveryDate: { gte: new Date(deliveryDate) } }), // New: Filter by deliveryDate
       ...(returnDate && { returnDate: { lte: new Date(returnDate) } }),     // New: Filter by returnDate
+      ...(inStock && { returnDate: null }), // New: Filter for in-stock equipment
     }
 
     if (isAdmin(session)) {
