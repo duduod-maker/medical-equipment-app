@@ -41,6 +41,8 @@ export function EquipmentList() {
 
   const [selectedType, setSelectedType] = useState("")
   const [selectedUser, setSelectedUser] = useState("") // New state for user filter
+  const [deliveryDateSearch, setDeliveryDateSearch] = useState("") // New state for delivery date search
+  const [returnDateSearch, setReturnDateSearch] = useState("") // New state for return date search
   const [showForm, setShowForm] = useState(false)
   const [editingEquipment, setEditingEquipment] = useState<Equipment | null>(null)
 
@@ -75,6 +77,8 @@ export function EquipmentList() {
     if (debouncedSearch) params.append("search", debouncedSearch);
     if (selectedType) params.append("type", selectedType);
     if (selectedUser) params.append("userId", selectedUser);
+    if (deliveryDateSearch) params.append("deliveryDate", deliveryDateSearch); // Add deliveryDate to params
+    if (returnDateSearch) params.append("returnDate", returnDateSearch);     // Add returnDate to params
 
     fetch(`/api/equipment?${params}`)
       .then(response => {
@@ -92,7 +96,7 @@ export function EquipmentList() {
       .finally(() => {
         setLoading(false);
       });
-  }, [debouncedSearch, selectedType, selectedUser, setEquipment]); // Direct dependencies
+  }, [debouncedSearch, selectedType, selectedUser, deliveryDateSearch, returnDateSearch, setEquipment]); // Add new dependencies
 
   useEffect(() => {
     fetchEquipmentTypes();
@@ -111,10 +115,9 @@ export function EquipmentList() {
           method: "DELETE",
         })
         if (response.ok) {
-          // No longer calling fetchEquipment() directly here, as it's now part of useEffect
-          // The useEffect will re-run when dependencies change, but not directly after delete
-          // For immediate refresh after delete, you might need to manually trigger fetchEquipment
-          // or update the equipment state directly. For now, relying on next render.
+          setEquipment((prevEquipment) =>
+            prevEquipment.filter((item) => item.id !== id)
+          )
         }
       } catch (error) {
         console.error("Erreur lors de la suppression:", error)
@@ -141,21 +144,25 @@ export function EquipmentList() {
     setSelectedUser(userId);
   };
 
+  const handlePrint = () => {
+    window.print();
+  };
+
   return (
     <div className="space-y-6">
       <div className="bg-white p-6 rounded-lg shadow">
-        <div className="flex flex-col sm:flex-row gap-4 mb-4">
+        <div className="flex flex-col sm:flex-row gap-2 mb-4 items-center">
           <input
             type="text"
             placeholder="Rechercher par référence, résident, secteur..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900"
+            className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 no-print"
           />
           <select
             value={selectedType}
             onChange={(e) => setSelectedType(e.target.value)}
-            className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900"
+            className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 no-print"
           >
             <option value="">Tous les types</option>
             {equipmentTypes.map((type) => (
@@ -164,11 +171,25 @@ export function EquipmentList() {
               </option>
             ))}
           </select>
+          <input
+            type="date"
+            value={deliveryDateSearch}
+            onChange={(e) => setDeliveryDateSearch(e.target.value)}
+            className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 no-print"
+            title="Date de livraison (à partir de cette date)"
+          />
+          <input
+            type="date"
+            value={returnDateSearch}
+            onChange={(e) => setReturnDateSearch(e.target.value)}
+            className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 no-print"
+            title="Date de reprise (jusqu'à cette date)"
+          />
           {isAdmin(session) && (
             <select
               value={selectedUser}
               onChange={(e) => handleUserSelect(e.target.value)}
-              className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900"
+              className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 no-print"
             >
               <option value="">Tous les utilisateurs</option>
               {users.map((user) => (
@@ -180,14 +201,20 @@ export function EquipmentList() {
           )}
           <button
             onClick={() => setShowForm(true)}
-            className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 no-print"
           >
-            Ajouter du matériel
+            Ajouter
+          </button>
+          <button
+            onClick={handlePrint}
+            className="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 no-print"
+          >
+            Imprimer
           </button>
         </div>
 
         {showForm && (
-          <div className="mb-6 border-t pt-6">
+          <div className="mb-6 border-t pt-6 no-print">
             <EquipmentForm
               equipment={editingEquipment}
               equipmentTypes={equipmentTypes}
@@ -199,36 +226,36 @@ export function EquipmentList() {
         )}
 
         <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200">
+          <table className="divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Type
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Référence
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Secteur
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Chambre
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Résident
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Date de livraison
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Date de reprise
                 </th>
                 {isAdmin(session) && (
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Utilisateur
                   </th>
                 )}
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Actions
                 </th>
               </tr>

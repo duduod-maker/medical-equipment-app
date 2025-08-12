@@ -4,7 +4,11 @@ import { useSession, signOut } from "next-auth/react"
 import Link from "next/link"
 import { useRouter, usePathname } from "next/navigation";
 
-export function Header() {
+interface HeaderProps {
+  className?: string;
+}
+
+export function Header({ className }: HeaderProps) {
   const { data: session } = useSession()
   const pathname = usePathname();
 
@@ -14,7 +18,7 @@ export function Header() {
   };
 
   return (
-    <header className="bg-white shadow">
+    <header className={`bg-white shadow ${className || ''}`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
           <div className="flex">

@@ -14,7 +14,9 @@ export async function GET(request: Request) {
     const { searchParams } = new URL(request.url)
     const search = searchParams.get("search") || ""
     const type = searchParams.get("type") || ""
-    const filterUserId = searchParams.get("userId") || "" // Get userId from search params
+    const filterUserId = searchParams.get("userId") || ""
+    const deliveryDate = searchParams.get("deliveryDate") // New: Get deliveryDate
+    const returnDate = searchParams.get("returnDate")     // New: Get returnDate
 
     const where: any = {
       ...(search && {
@@ -25,6 +27,8 @@ export async function GET(request: Request) {
         ],
       }),
       ...(type !== '' && { typeId: { equals: type } }),
+      ...(deliveryDate && { deliveryDate: { gte: new Date(deliveryDate) } }), // New: Filter by deliveryDate
+      ...(returnDate && { returnDate: { lte: new Date(returnDate) } }),     // New: Filter by returnDate
     }
 
     if (isAdmin(session)) {

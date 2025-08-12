@@ -48,39 +48,39 @@ export function EquipmentItem({ equipment, onEdit, onDelete, showUser }: Equipme
   return (
     <>
       <tr>
-        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+        <td className="px-4 py-4 text-sm font-medium text-gray-900">
           {equipment.type.name}
         </td>
-        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+        <td className="px-4 py-4 text-sm text-gray-500">
           {equipment.reference || "-"}
         </td>
-        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+        <td className="px-4 py-4 text-sm text-gray-500">
           {equipment.sector}
         </td>
-        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+        <td className="px-4 py-4 text-sm text-gray-500">
           {equipment.room}
         </td>
-        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+        <td className="px-4 py-4 text-sm text-gray-500">
           {equipment.resident}
         </td>
-        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+        <td className="px-4 py-4 text-sm text-gray-500">
           {formatDate(equipment.deliveryDate)}
         </td>
-        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+        <td className="px-4 py-4 text-sm text-gray-500">
           {formatDate(equipment.returnDate)}
         </td>
         {showUser && (
-          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+          <td className="px-4 py-4 text-sm text-gray-500">
             {equipment.user.name || equipment.user.email}
           </td>
         )}
-        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+        <td className="px-4 py-4 text-sm font-medium">
           <div className="flex space-x-2">
             <button
               onClick={handleOpenModal}
               className="text-green-600 hover:text-green-900"
             >
-              Mise au panier
+              Panier
             </button>
             {canManage && (
               <>
