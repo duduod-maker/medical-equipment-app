@@ -43,7 +43,7 @@ export function EquipmentList() {
   const [selectedUser, setSelectedUser] = useState("") // New state for user filter
   const [deliveryDateSearch, setDeliveryDateSearch] = useState("") // New state for delivery date search
   const [returnDateSearch, setReturnDateSearch] = useState("") // New state for return date search
-  const [showInStockOnly, setShowInStockOnly] = useState(false) // New state for in-stock filter
+  const [showInStockOnly, setShowInStockOnly] = useState(true) // New state for in-stock filter
   const [showForm, setShowForm] = useState(false)
   const [editingEquipment, setEditingEquipment] = useState<Equipment | null>(null)
 
