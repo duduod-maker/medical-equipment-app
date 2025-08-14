@@ -227,6 +227,10 @@ export function EquipmentList() {
           </button>
         </div>
 
+        <div className="text-right text-sm text-gray-600 mb-4">
+          Affichage de {equipment.length} équipement(s)
+        </div>
+
         {showForm && (
           <div className="mb-6 border-t pt-6 no-print">
             <EquipmentForm

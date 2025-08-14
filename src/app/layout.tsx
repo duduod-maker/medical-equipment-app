@@ -19,6 +19,8 @@ export const metadata: Metadata = {
   description: "Application de gestion de matériel médical en location",
 };
 
+import { Footer } from "@/components/layout/footer"; // Import Footer
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -32,6 +34,7 @@ export default function RootLayout({
         <AuthProvider>
           <CartProvider>{children}</CartProvider>
         </AuthProvider>
+        <Footer /> {/* Render Footer */}
       </body>
     </html>
   );

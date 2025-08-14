@@ -35,13 +35,16 @@ export default function Home() {
       <Header className="no-print" />
       <main className="mx-auto max-w-7xl py-6 px-4 sm:px-6 lg:px-8"> {/* Re-added max-w-7xl */}
         <div className="py-6 sm:px-0">
-          <div className="mb-6">
-            <h1 className="text-2xl font-bold text-gray-900">
-              Gestion du matériel médical
-            </h1>
-            <p className="mt-1 text-sm text-gray-600">
-              Gérez vos équipements médicaux et suivez vos demandes
-            </p>
+          <div className="mb-6 flex items-center"> {/* Added flex and items-center */}
+            <img src="/window.svg" alt="Medical Equipment" className="h-12 w-12 mr-4" /> {/* Added image */}
+            <div>
+              <h1 className="text-2xl font-bold text-gray-900">
+                Gestion du matériel médical
+              </h1>
+              <p className="mt-1 text-sm text-gray-600">
+                Gérez vos équipements médicaux et suivez vos demandes
+              </p>
+            </div>
           </div>
           <div className="w-full"> {/* Add a full-width wrapper */}
             <EquipmentList />
