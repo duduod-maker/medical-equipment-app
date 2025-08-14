@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server"
+import { revalidatePath } from "next/cache"
 import { getServerSession } from "next-auth"
 import { prisma } from "@/lib/prisma"
 import { authOptions } from "@/lib/auth"
@@ -88,6 +89,9 @@ export async function POST(request: Request) {
         user: { select: { name: true, email: true } },
       },
     })
+
+    revalidatePath("/")
+    revalidatePath("/requests")
 
     return NextResponse.json(equipment)
   } catch (error: unknown) {

@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server"
+import { revalidatePath } from "next/cache"
 import { getServerSession } from "next-auth"
 import { prisma } from "@/lib/prisma"
 import { authOptions } from "@/lib/auth"
@@ -6,10 +7,9 @@ import { canManageEquipment, isAdmin } from "@/lib/permissions"
 
 export async function PUT(
   request: Request,
-  context: { params: { id: string } }
+  { params }: { params: { id: string } }
 ) {
-  const { params } = await context; // Await context
-  const { id } = params;
+  const { id } = await params;
   try {
     const session = await getServerSession(authOptions)
     if (!session) {
@@ -52,6 +52,9 @@ export async function PUT(
       },
     })
 
+    revalidatePath("/")
+    revalidatePath("/requests")
+
     return NextResponse.json(updatedEquipment)
   } catch (error) {
     console.error("Error updating equipment:", error);
@@ -64,10 +67,9 @@ export async function PUT(
 
 export async function DELETE(
   request: Request,
-  context: { params: { id: string } }
+  { params }: { params: { id: string } }
 ) {
-  const { params } = await context; // Await context
-  const { id } = params;
+  const { id } = await params;
   try {
     const session = await getServerSession(authOptions)
     if (!session) {
@@ -89,6 +91,9 @@ export async function DELETE(
     await prisma.equipment.delete({
       where: { id },
     })
+
+    revalidatePath("/")
+    revalidatePath("/requests")
 
     return NextResponse.json({ message: "Matériel supprimé avec succès" })
   } catch (error) { // Supprime ": unknown"

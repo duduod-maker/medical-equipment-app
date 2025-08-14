@@ -71,34 +71,33 @@ export function EquipmentList() {
     }
   }, [setUsers]);
 
-  useEffect(() => {
-    console.log("Fetching equipment due to dependency change (direct dependencies)..."); // Added for debugging
+  const fetchEquipment = useCallback(async () => {
     setLoading(true);
     const params = new URLSearchParams();
     if (debouncedSearch) params.append("search", debouncedSearch);
     if (selectedType) params.append("type", selectedType);
     if (selectedUser) params.append("userId", selectedUser);
-    if (deliveryDateSearch) params.append("deliveryDate", deliveryDateSearch); // Add deliveryDate to params
-    if (returnDateSearch) params.append("returnDate", returnDateSearch);     // Add returnDate to params
-    if (showInStockOnly) params.append("inStock", "true"); // Add inStock to params
+    if (deliveryDateSearch) params.append("deliveryDate", deliveryDateSearch);
+    if (returnDateSearch) params.append("returnDate", returnDateSearch);
+    if (showInStockOnly) params.append("inStock", "true");
 
-    fetch(`/api/equipment?${params}`)
-      .then(response => {
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        return response.json();
-      })
-      .then(data => {
-        setEquipment(data);
-      })
-      .catch(error => {
-        console.error("Erreur lors du chargement du matériel:", error);
-      })
-      .finally(() => {
-        setLoading(false);
-      });
-  }, [debouncedSearch, selectedType, selectedUser, deliveryDateSearch, returnDateSearch, showInStockOnly, setEquipment]); // Add new dependencies
+    try {
+      const response = await fetch(`/api/equipment?${params}`);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      const data = await response.json();
+      setEquipment(data);
+    } catch (error) {
+      console.error("Erreur lors du chargement du matériel:", error);
+    } finally {
+      setLoading(false);
+    }
+  }, [debouncedSearch, selectedType, selectedUser, deliveryDateSearch, returnDateSearch, showInStockOnly, setEquipment]);
+
+  useEffect(() => {
+    fetchEquipment();
+  }, [fetchEquipment]);
 
   useEffect(() => {
     fetchEquipmentTypes();
@@ -117,9 +116,7 @@ export function EquipmentList() {
           method: "DELETE",
         })
         if (response.ok) {
-          setEquipment((prevEquipment) =>
-            prevEquipment.filter((item) => item.id !== id)
-          )
+          fetchEquipment() // Refetch equipment list
         }
       } catch (error) {
         console.error("Erreur lors de la suppression:", error)
@@ -130,10 +127,7 @@ export function EquipmentList() {
   const handleFormSuccess = () => {
     setShowForm(false)
     setEditingEquipment(null)
-    // No longer calling fetchEquipment() directly here, as it's now part of useEffect
-    // The useEffect will re-run when dependencies change, but not directly after success
-    // For immediate refresh after success, you might need to manually trigger fetchEquipment
-    // or update the equipment state directly. For now, relying on next render.
+    fetchEquipment() // Refetch equipment list
   }
 
   const handleFormCancel = () => {

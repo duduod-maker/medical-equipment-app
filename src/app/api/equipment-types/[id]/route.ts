@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server"
+import { revalidatePath } from "next/cache"
 import { getServerSession } from "next-auth"
 import { prisma } from "@/lib/prisma"
 import { authOptions } from "@/lib/auth"
@@ -53,6 +54,9 @@ export async function PUT(
       data: { name },
     })
 
+    revalidatePath("/")
+    revalidatePath("/admin")
+
     return NextResponse.json(updatedEquipmentType)
   } catch (error: unknown) {
     console.error("Erreur lors de la mise à jour du type de matériel:", error);
@@ -78,6 +82,9 @@ export async function DELETE(
     await prisma.equipmentType.delete({
       where: { id },
     })
+
+    revalidatePath("/")
+    revalidatePath("/admin")
 
     return NextResponse.json({ message: "Type de matériel supprimé" })
   } catch (error: unknown) {

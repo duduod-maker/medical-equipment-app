@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server"
+import { revalidatePath } from "next/cache"
 import { getServerSession } from "next-auth"
 import { prisma } from "@/lib/prisma"
 import { authOptions } from "@/lib/auth"
@@ -38,6 +39,9 @@ export async function POST(request: Request) {
     const equipmentType = await prisma.equipmentType.create({
       data: { name },
     })
+
+    revalidatePath("/")
+    revalidatePath("/admin")
 
     return NextResponse.json(equipmentType)
   } catch (error: unknown) {

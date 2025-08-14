@@ -1,12 +1,9 @@
- ✓ Compiled /api/equipment/[id] in 212ms (1017 modules)
 Error: Route "/api/equipment/[id]" used `params.id`. `params` should be awaited before using its properties. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis
-    at PUT (src\app\api\equipment\[id]\route.ts:11:10)
-   9 |   context: { params: { id: string } }
-  10 | ) {
-> 11 |   const { id } = context.params;
-     |          ^
-  12 |   try {
-  13 |     const session = await getServerSession(authOptions)
-  14 |     if (!session) {
- PUT /api/equipment/cme8qwjp800059amwhwyxez70 200 in 791ms
- GET /api/equipment? 200 in 12ms
+    at DELETE (src\app\api\equipment\[id]\route.ts:68:28)
+  66 |   context: { params: { id: string } }
+  67 | ) {
+> 68 |   const id = context.params.id;
+     |                            ^
+  69 |   try {
+  70 |     const session = await getServerSession(authOptions)
+  71 |     if (!session) {
