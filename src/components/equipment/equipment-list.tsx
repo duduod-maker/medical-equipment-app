@@ -3,7 +3,7 @@ import { useSession } from "next-auth/react"
 import { EquipmentForm } from "./equipment-form"
 import { EquipmentItem } from "././equipment-item"
 import { isAdmin } from "@/lib/permissions"
-import { User } from "@/types/equipment" // Assuming User type is here or similar
+import { Equipment, EquipmentType, User } from "@/types/equipment"
 import { UserSearchSelect } from "@/components/user/UserSearchSelect"
 
 // Custom hook for debouncing
@@ -144,6 +144,40 @@ export function EquipmentList() {
     window.print();
   };
 
+  const exportToCsv = () => {
+    const csvData = equipment.map(item => ({
+      Type: item.type?.name || '',
+      Reference: item.reference || '',
+      Secteur: item.sector,
+      Chambre: item.room,
+      Resident: item.resident,
+      'Date de livraison': item.deliveryDate ? new Date(item.deliveryDate).toLocaleDateString('fr-FR') : '',
+      'Date de reprise': item.returnDate ? new Date(item.returnDate).toLocaleDateString('fr-FR') : '',
+      Utilisateur: isAdmin(session) && item.user ? (item.user.name || item.user.email) : ''
+    }));
+
+    const csvHeader = Object.keys(csvData[0] || {}).join(',');
+    const csvRows = csvData.map(row => 
+      Object.values(row).map(value => 
+        typeof value === 'string' && value.includes(',') ? `"${value}"` : value
+      ).join(',')
+    );
+    
+    const csvContent = [csvHeader, ...csvRows].join('\n');
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    
+    if (link.download !== undefined) {
+      const url = URL.createObjectURL(blob);
+      link.setAttribute('href', url);
+      link.setAttribute('download', `equipments_${new Date().toISOString().split('T')[0]}.csv`);
+      link.style.visibility = 'hidden';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+  };
+
   return (
     <div className="space-y-6">
       <div className="bg-white p-6 rounded-lg shadow">
@@ -218,6 +252,12 @@ export function EquipmentList() {
             className="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 no-print"
           >
             Imprimer
+          </button>
+          <button
+            onClick={exportToCsv}
+            className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 no-print"
+          >
+            Exporter CSV
           </button>
         </div>
 

@@ -1,9 +1,72 @@
-Error: Route "/api/equipment/[id]" used `params.id`. `params` should be awaited before using its properties. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis
-    at DELETE (src\app\api\equipment\[id]\route.ts:68:28)
-  66 |   context: { params: { id: string } }
-  67 | ) {
-> 68 |   const id = context.params.id;
-     |                            ^
-  69 |   try {
-  70 |     const session = await getServerSession(authOptions)
-  71 |     if (!session) {
+PS K:\medical-equipment-app> npm run dev
+
+> medical-equipment-app@0.1.0 dev
+> next dev
+
+   ▲ Next.js 15.4.6
+   - Local:        http://localhost:3000
+   - Network:      http://192.168.0.46:3000
+   - Environments: .env
+
+ ✓ Starting...
+ ✓ Ready in 1475ms
+ ○ Compiling /middleware ...
+ ✓ Compiled /middleware in 935ms (734 modules)
+ ⨯ ./src/components/equipment/equipment-list.tsx
+Error:   × Unterminated regexp literal
+     ╭─[K:\medical-equipment-app\src\components\equipment\equipment-list.tsx:375:1]
+ 372 │           </table>
+ 373 │         </div>
+ 374 │       </div>
+ 375 │     </div>
+     ·      ─────
+ 376 │   )
+ 377 │ }
+     ╰────
+  × Expression expected
+     ╭─[K:\medical-equipment-app\src\components\equipment\equipment-list.tsx:375:1]
+ 372 │           </table>
+ 373 │         </div>
+ 374 │       </div>
+ 375 │     </div>
+     ·       ────
+ 376 │   )
+ 377 │ }
+     ╰────
+
+Caused by:
+    Syntax Error
+
+Import trace for requested module:
+./src/components/equipment/equipment-list.tsx
+./src/app/page.tsx
+ ○ Compiling / ...
+ ⨯ ./src/components/equipment/equipment-list.tsx
+Error:   × Unterminated regexp literal
+     ╭─[K:\medical-equipment-app\src\components\equipment\equipment-list.tsx:375:1]
+ 372 │           </table>
+ 373 │         </div>
+ 374 │       </div>
+ 375 │     </div>
+     ·      ─────
+ 376 │   )
+ 377 │ }
+     ╰────
+  × Expression expected
+     ╭─[K:\medical-equipment-app\src\components\equipment\equipment-list.tsx:375:1]
+ 372 │           </table>
+ 373 │         </div>
+ 374 │       </div>
+ 375 │     </div>
+     ·       ────
+ 376 │   )
+ 377 │ }
+     ╰────
+
+Caused by:
+    Syntax Error
+
+Import trace for requested module:
+./src/components/equipment/equipment-list.tsx
+./src/app/page.tsx
+ GET / 500 in 300ms
