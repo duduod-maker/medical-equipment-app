@@ -65,12 +65,18 @@ export function EquipmentForm({ equipment, equipmentTypes, users, onSuccess, onC
       const url = equipment ? `/api/equipment/${equipment.id}` : "/api/equipment"
       const method = equipment ? "PUT" : "POST"
 
+      // Prepare data with proper weight conversion
+      const submitData = {
+        ...formData,
+        weight: formData.weight && formData.weight.trim() !== '' ? formData.weight : undefined
+      }
+
       const response = await fetch(url, {
         method,
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(submitData),
       })
 
       if (response.ok) {

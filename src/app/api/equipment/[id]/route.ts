@@ -42,7 +42,7 @@ export async function PUT(
         sector,
         room,
         resident,
-        weight: weight ? parseFloat(weight) : null,
+        weight: weight && weight !== '' ? parseFloat(weight) : null,
         deliveryDate: deliveryDate ? new Date(deliveryDate) : null,
         returnDate: returnDate ? new Date(returnDate) : null,
         userId: newUserId,

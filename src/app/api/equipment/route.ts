@@ -80,7 +80,7 @@ export async function POST(request: Request) {
         sector,
         room,
         resident,
-        weight: weight ? parseFloat(weight) : null,
+        weight: weight && weight !== '' ? parseFloat(weight) : null,
         deliveryDate: deliveryDate ? new Date(deliveryDate) : null,
         returnDate: returnDate ? new Date(returnDate) : null,
         userId: isAdmin(session) && userId ? userId : session.user.id, // Use provided userId if admin, else session user's ID
