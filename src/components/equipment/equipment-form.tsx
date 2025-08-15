@@ -95,10 +95,11 @@ export function EquipmentForm({ equipment, equipmentTypes, users, onSuccess, onC
           })
         }
       } else {
-        setError("Erreur lors de la sauvegarde")
+        const errorData = await response.json().catch(() => null);
+        setError(errorData?.error || `Erreur ${response.status}: ${response.statusText}`)
       }
     } catch (error) {
-      setError("Erreur lors de la sauvegarde")
+      setError(`Erreur réseau: ${error instanceof Error ? error.message : 'Erreur inconnue'}`)
     } finally {
       setLoading(false)
     }
