@@ -31,6 +31,25 @@ function parseDate(dateString: string | undefined | null): Date | null {
   return null; // Invalid format or date
 }
 
+function parseWeight(weightString: string | undefined | null): number | null {
+  if (!weightString || weightString.trim() === '') return null;
+  
+  // Remove any non-numeric characters except dots and commas
+  const cleanWeight = weightString.toString().replace(/[^\d.,]/g, '');
+  
+  // Replace comma with dot for decimal parsing
+  const normalizedWeight = cleanWeight.replace(',', '.');
+  
+  const weight = parseFloat(normalizedWeight);
+  
+  // Validate the weight is a positive number
+  if (isNaN(weight) || weight < 0) {
+    return null;
+  }
+  
+  return weight;
+}
+
 async function importEquipment() {
   console.log('Démarrage de l\'importation des équipements...');
 
@@ -68,6 +87,7 @@ async function importEquipment() {
 
         const deliveryDate = parseDate(record.deliveryDate);
         const returnDate = parseDate(record.returnDate);
+        const weight = parseWeight(record.weight || record.poids); // Support both 'weight' and 'poids' columns
 
         await prisma.equipment.create({
           data: {
@@ -75,6 +95,7 @@ async function importEquipment() {
             sector: record.sector,
             room: record.room,
             resident: record.resident,
+            weight: weight,
             deliveryDate: deliveryDate,
             returnDate: returnDate,
             userId: user.id,

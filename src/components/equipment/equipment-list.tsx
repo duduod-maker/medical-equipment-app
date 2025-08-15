@@ -151,6 +151,7 @@ export function EquipmentList() {
       Secteur: item.sector,
       Chambre: item.room,
       Resident: item.resident,
+      'Poids (kg)': item.weight || '',
       'Date de livraison': item.deliveryDate ? new Date(item.deliveryDate).toLocaleDateString('fr-FR') : '',
       'Date de reprise': item.returnDate ? new Date(item.returnDate).toLocaleDateString('fr-FR') : '',
       Utilisateur: isAdmin(session) && item.user ? (item.user.name || item.user.email) : ''
@@ -297,6 +298,9 @@ export function EquipmentList() {
                   Résident
                 </th>
                 <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Poids (kg)
+                </th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Date de livraison
                 </th>
                 <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -315,13 +319,13 @@ export function EquipmentList() {
             <tbody className="bg-white divide-y divide-gray-200">
               {loading ? (
                 <tr>
-                  <td colSpan={isAdmin(session) ? 10 : 9} className="text-center py-4 text-gray-700">
+                  <td colSpan={isAdmin(session) ? 11 : 10} className="text-center py-4 text-gray-700">
                     Chargement...
                   </td>
                 </tr>
               ) : equipment.length === 0 ? (
                 <tr>
-                  <td colSpan={isAdmin(session) ? 10 : 9} className="text-center py-4 text-gray-500">
+                  <td colSpan={isAdmin(session) ? 11 : 10} className="text-center py-4 text-gray-500">
                     Aucun équipement trouvé
                   </td>
                 </tr>

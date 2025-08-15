@@ -9,6 +9,7 @@ export interface Equipment {
   sector: string
   room: string
   resident: string
+  weight?: number
   deliveryDate?: string
   returnDate?: string
   type: {

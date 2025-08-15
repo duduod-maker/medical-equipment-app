@@ -17,7 +17,7 @@ export async function PUT(
     }
 
     const body = await request.json()
-    const { typeId, reference, sector, room, resident, deliveryDate, returnDate, userId } = body
+    const { typeId, reference, sector, room, resident, weight, deliveryDate, returnDate, userId } = body
 
     const existingEquipment = await prisma.equipment.findUnique({
       where: { id },
@@ -42,6 +42,7 @@ export async function PUT(
         sector,
         room,
         resident,
+        weight: weight ? parseFloat(weight) : null,
         deliveryDate: deliveryDate ? new Date(deliveryDate) : null,
         returnDate: returnDate ? new Date(returnDate) : null,
         userId: newUserId,

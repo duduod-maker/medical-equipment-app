@@ -29,6 +29,7 @@ export function EquipmentForm({ equipment, equipmentTypes, users, onSuccess, onC
     sector: "",
     room: "",
     resident: "",
+    weight: "",
     deliveryDate: "",
     returnDate: "",
     userId: "", // Add userId to formData state
@@ -44,6 +45,7 @@ export function EquipmentForm({ equipment, equipmentTypes, users, onSuccess, onC
         sector: equipment.sector,
         room: equipment.room,
         resident: equipment.resident,
+        weight: equipment.weight?.toString() || "",
         deliveryDate: equipment.deliveryDate ? new Date(equipment.deliveryDate).toISOString().split('T')[0] : "",
         returnDate: equipment.returnDate ? new Date(equipment.returnDate).toISOString().split('T')[0] : "",
         userId: equipment.userId, // Populate userId
@@ -80,6 +82,7 @@ export function EquipmentForm({ equipment, equipmentTypes, users, onSuccess, onC
             sector: "",
             room: "",
             resident: "",
+            weight: "",
             deliveryDate: "", // Add this
             returnDate: "",  // Add this
             userId: "",      // Add this
@@ -164,7 +167,7 @@ export function EquipmentForm({ equipment, equipmentTypes, users, onSuccess, onC
             />
           </div>
 
-          <div className="md:col-span-2">
+          <div>
             <label htmlFor="resident" className="block text-sm font-medium text-gray-700">
               Nom et prénom du résident *
             </label>
@@ -174,6 +177,21 @@ export function EquipmentForm({ equipment, equipmentTypes, users, onSuccess, onC
               required
               value={formData.resident}
               onChange={(e) => setFormData({ ...formData, resident: e.target.value })}
+              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-gray-900"
+            />
+          </div>
+
+          <div>
+            <label htmlFor="weight" className="block text-sm font-medium text-gray-700">
+              Poids (kg)
+            </label>
+            <input
+              type="number"
+              id="weight"
+              step="0.1"
+              min="0"
+              value={formData.weight}
+              onChange={(e) => setFormData({ ...formData, weight: e.target.value })}
               className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-gray-900"
             />
           </div>

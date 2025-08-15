@@ -43,6 +43,7 @@ model Equipment {
   sector    String
   room      String
   resident    String
+  weight      Float?
   deliveryDate DateTime?
   returnDate   DateTime?
   createdAt   DateTime @default(now())

@@ -71,7 +71,7 @@ export async function POST(request: Request) {
     }
 
     const body = await request.json()
-    const { typeId, reference, sector, room, resident, deliveryDate, returnDate, userId } = body // Add userId
+    const { typeId, reference, sector, room, resident, weight, deliveryDate, returnDate, userId } = body // Add weight
 
     const equipment = await prisma.equipment.create({
       data: {
@@ -80,6 +80,7 @@ export async function POST(request: Request) {
         sector,
         room,
         resident,
+        weight: weight ? parseFloat(weight) : null,
         deliveryDate: deliveryDate ? new Date(deliveryDate) : null,
         returnDate: returnDate ? new Date(returnDate) : null,
         userId: isAdmin(session) && userId ? userId : session.user.id, // Use provided userId if admin, else session user's ID

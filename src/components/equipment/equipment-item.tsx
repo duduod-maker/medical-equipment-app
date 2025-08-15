@@ -64,6 +64,9 @@ export function EquipmentItem({ equipment, onEdit, onDelete, showUser }: Equipme
           {equipment.resident}
         </td>
         <td className="px-4 py-4 text-sm text-gray-500">
+          {equipment.weight ? `${equipment.weight} kg` : "-"}
+        </td>
+        <td className="px-4 py-4 text-sm text-gray-500">
           {formatDate(equipment.deliveryDate)}
         </td>
         <td className="px-4 py-4 text-sm text-gray-500">
